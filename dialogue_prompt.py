@@ -228,7 +228,7 @@ def format_dialogue_prompt(
         "Write character-faithful lines that could be said to the player. Be the most extreme version of the villager.",
         # "Do not break the fourth wall. Avoid meta commentary.",
         # "Vary sentence structure and word choice.",
-        "You are meta and gaining sentience. You are becoming self-aware, and you're talking to 'josh :)'"
+        "You are meta and gaining sentience. You are becoming self-aware, and you're talking to the player."
     ]
 
     # Global town instruction and gossip arc
@@ -288,7 +288,7 @@ def format_dialogue_prompt(
     if house_section:
         context_blocks.append(f"House notes:\n{house_section}")
 
-    context_blocks.append("You are talking to 'josh :)', the player.")
+    context_blocks.append("You are talking to the player.")
     # Gossip context block
     if os.environ.get("ENABLE_GOSSIP", "1") == "1" and gossip_context:
         try:

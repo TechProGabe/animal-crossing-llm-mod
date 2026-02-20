@@ -7,6 +7,7 @@ Direct read/write functions for specific memory blocks.
 import struct
 import time
 import sys  # Added: To check the operating system
+import os
 from typing import Optional, Union
 
 # --- MODIFIED: Platform-specific imports ---
@@ -16,6 +17,7 @@ if sys.platform == 'darwin':
     from macos_memory_reader import MacOSMemoryReader
 elif sys.platform == 'win32':
     from windows_memory_reader import WindowsMemoryReader
+from gdb_memory_reader import GdbMemoryReader
 
 
 # -------------------------------------------
@@ -26,7 +28,11 @@ class MemoryIPC:
 
     def __init__(self):
         # --- MODIFIED: Select reader based on OS ---
-        if sys.platform == 'darwin':
+        use_gdb = os.environ.get("USE_GDB_MEMORY", "0") == "1"
+        if use_gdb:
+            print("⚠️ EXPERIMENTAL: Using GDB Memory Reader. Ensure Dolphin's 'Enable GDB Stub' is checked.")
+            self.reader = GdbMemoryReader()
+        elif sys.platform == 'darwin':
             self.reader = MacOSMemoryReader()
         elif sys.platform == 'win32':
             self.reader = WindowsMemoryReader()

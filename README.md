@@ -1,150 +1,149 @@
 # 🐬 Animal Crossing LLM Mod
 
-**Transform Animal Crossing into an AI-powered conversation experience!** This mod uses Large Language Models to generate dynamic, contextual dialogue for villagers in real-time.
+**Transform Animal Crossing into an AI-powered conversation experience!** This mod uses Large Language Models (LLMs) to generate dynamic, contextual dialogue for villagers in real-time.
 
-> ⚠️ **EXPERIMENTAL SOFTWARE**: This mod has known bugs and is only tested on macOS. Use at your own risk! PRs welcome to help improve it.
+> ⚠️ **EXPERIMENTAL SOFTWARE**: This mod has known bugs and supports Windows and macOS. Note: Newer versions of macOS may have issues reading memory due to System Integrity Protection (SIP). The only supported language is English. Use at your own risk! PRs welcome to help improve it.
 
-## 🎥 What This Does
+---
 
-Ever wanted to have meaningful conversations with your Animal Crossing villagers? This mod:
-- **Reads dialogue memory** from Animal Crossing running in Dolphin emulator
-- **Generates AI responses** using Google Gemini or OpenAI models
-- **Writes new dialogue** back to the game in real-time
-- **Creates dynamic conversations** that feel natural and contextual
+## ✨ Features
 
-## 🚀 Quick Start (For YouTube Viewers)
+Ever wanted to have meaningful conversations with your Animal Crossing villagers? This mod brings them to life:
+- **Smart Dialogue Generation**: Context-aware responses based on game state, utilizing Google Gemini or OpenAI models.
+- **Real-time Integration**: Reads dialogue directly from the GameCube memory and writes new AI dialogue back seamlessly.
+- **Screenshot Context**: Captures game screens to provide visual context (location, weather, items) to the AI.
+- **Gossip System**: Villagers have a persistent memory; they remember past conversations and reference them later.
+- **Memory Safety**: Designed to prevent overwriting active memory during conversations.
 
-### 1. Install Python & Dependencies
-```bash
-# Install Python 3.8+ from python.org
-# Then install dependencies
-pip install -r requirements.txt
+---
+
+## 📋 Prerequisites
+
+Before starting, ensure you have the following ready:
+1. **Python 3.8+** installed on your system ([python.org](https://python.org)).
+2. **Dolphin Emulator** installed and configured.
+3. **Animal Crossing (GAFE01) ROM** (GameCube version).
+4. An **API Key** from either Google Gemini (Free tier available) or OpenAI.
+
+---
+
+## 🚀 Installation
+
+Install the mod by running the easy installer for your platform. This will create a virtual environment (`venv`) and install all required dependencies.
+
+**Windows:**
+```cmd
+install.bat
 ```
 
-### 2. Setup Environment Variables
-Create a `.env` file in the project folder:
+**macOS/Linux:**
 ```bash
-# For Google Gemini (Free tier available)
-GOOGLE_API_KEY=your_api_key_here
-
-# For OpenAI (Paid)
-OPENAI_API_KEY=your_api_key_here
-
-# Optional: Enable features
-ENABLE_SCREENSHOT=1
-ENABLE_GOSSIP=1
-GENERATION_SUPPRESS_SECONDS=25
+./install.sh
 ```
 
-### 3. Run Animal Crossing in Dolphin
-- Download Dolphin emulator
-- Load Animal Crossing (GAFE01) ROM
-- **⚠️ IMPORTANT**: Start the game and wait until you're past the loading screen and in the actual game world
-- Get to a conversation with a villager
+*(Alternatively, you can manually create a virtual environment and run `pip install -r requirements.txt`)*
 
-### 4. Launch the Mod
+---
+
+## ⚙️ Configuration
+
+1. Create a `.env` file in the project folder (you can copy `env_template.txt` to `.env`).
+2. Add your API keys and configure the mod settings:
+
 ```bash
-# Watch mode - continuously generates dialogue
+# Choose your primary LLM provider (google or openai)
+MODEL_PROVIDER=openai
+
+# Your API Keys (Only the one for your chosen provider is required)
+GOOGLE_API_KEY=your_gemini_api_key_here
+# OPENAI_API_KEY=your_openai_api_key_here
+
+# Enable/Disable Features (1 = Yes, 0 = No)
+ENABLE_SCREENSHOT=1             # Capture screenshots for context
+ENABLE_GOSSIP=1                 # Villagers remember past conversations
+GENERATION_SUPPRESS_SECONDS=25  # Cooldown between generations
+```
+
+---
+
+## 🧪 Experimental Mode (Fix for macOS SIP / Linux)
+
+If you are on **macOS** and see `Error code: 5`, or if you are on **Linux**, you must use the experimental GDB Memory Reader. This mode is platform-agnostic and uses a network socket instead of OS-level memory access.
+
+### 1. Enable GDB in Dolphin
+1. Open Dolphin Emulator.
+2. Go to **Config** -> **Advanced**.
+3. Check the box for **Enable GDB Stub**.
+4. (Optional) Ensure the port is set to `2345`.
+
+### 2. Enable in Mod Settings
+Add this line to your `.env` file:
+```bash
+USE_GDB_MEMORY=1
+```
+
+*Note: This mode is experimental and may have slightly higher latency than direct memory access.*
+
+---
+
+## 🎮 Usage
+
+**⚠️ IMPORTANT**: Start Animal Crossing in Dolphin and wait until you are *past the loading screen and in the actual game world* before launching the mod.
+
+Before running the scripts, make sure your virtual environment is activated:
+- **Windows:** `venv\Scripts\activate`
+- **macOS/Linux:** `source venv/bin/activate`
+
+### 1. Watch Mode (Continuous)
+This is the recommended mode for general gameplay or streaming. The mod will run in the background, continuously monitoring your interactions and generating dialogue dynamically.
+
+```bash
 python ac_parser_encoder.py --watch
+```
 
-# One-shot mode - generate once
+### 2. One-Shot Mode (Manual)
+```bash
+# Read memory and PRINT the AI dialogue (does not write to the game)
+python ac_parser_encoder.py
+
+# Read memory, generate AI dialogue, and WRITE it back to the game
 python ac_parser_encoder.py --write
 ```
 
-## 🎮 How It Works
+---
 
-1. **Memory Reading**: Connects to Dolphin's memory to read current dialogue
-2. **Context Analysis**: Captures screenshots and analyzes conversation context
-3. **AI Generation**: Uses LLM to create natural, contextual responses
-4. **Memory Writing**: Encodes and writes new dialogue back to the game
-5. **Real-time Updates**: Continuously monitors and updates conversations
+## 🧠 How It Works
 
-## 🔧 Advanced Usage
+1. **Memory Engine**: Connects to Dolphin using `dolphin-memory-engine` or the GDB Stub to access the GameCube's live memory.
+2. **State Analysis**: Detects when a conversation starts, reads the existing dialogue, and optionally takes a screenshot.
+3. **AI Generation**: Sends the game state, visual context, and character personality to an LLM to formulate a response.
+4. **Encoding**: Converts the AI response back into Animal Crossing's specific text format (including control codes and animations).
+5. **Injection**: Writes the generated text directly back to the dialogue memory address, taking over the conversation in real-time.
 
-### Watch Mode (Recommended for YouTube)
-```bash
-# Continuous monitoring with custom settings
-python ac_parser_encoder.py --watch --interval 0.1 --size 512 --print-all
-```
-
-### Custom Addresses
-```bash
-# Monitor multiple dialogue addresses
-python ac_parser_encoder.py --watch --addresses 0x81298360 0x81298380
-```
-
-### Debug Mode
-```bash
-# See raw hex data
-python ac_parser_encoder.py --dump
-```
-
-## 🌟 Features
-
-- **Smart Dialogue Generation**: Context-aware responses based on game state
-- **Real-time Updates**: Continuous monitoring and generation
-- **Screenshot Integration**: Visual context for better AI responses
-- **Gossip System**: Villagers remember and reference past conversations
-- **Multi-LLM Support**: Google Gemini and OpenAI compatibility
-- **Memory Safety**: Prevents overwriting during active conversations
-
-## 🎯 Perfect for YouTube Content
-
-- **Interactive Streams**: Let viewers suggest conversation topics
-- **AI Villager Showcases**: Demonstrate different personality types
-- **Modding Tutorials**: Show how to create custom game experiences
-- **AI Gaming Content**: Explore the future of AI-powered games
-
-## 🛠️ Technical Details
-
-- **Memory Engine**: Uses dolphin-memory-engine for GameCube memory access
-- **Text Encoding**: Full Animal Crossing character set and control code support
-- **LLM Integration**: Modular design supporting multiple AI providers
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-
-## 🚨 Important Notes
-
-- **Emulator Only**: This mod works with Dolphin emulator, not original hardware
-- **Memory Addresses**: May need adjustment for different game versions
-- **API Costs**: OpenAI usage incurs charges, Google Gemini has free tier
-- **Game Compatibility**: Tested with Animal Crossing (GAFE01) version
+---
 
 ## ⚠️ Known Issues & Limitations
 
-- **🪲 Some Obvious Bugs**: This is a work-in-progress mod with known issues
-- **🖥️ Platform Testing**: Only tested on macOS - Windows/Linux may have compatibility issues
-- **🎮 Timing Critical**: Must start the mod AFTER entering the game world (past loading screen)
-- **💾 Memory Stability**: May occasionally crash or behave unexpectedly
-- **🔧 Experimental**: This is experimental software - use at your own risk!
+- **Emulator Only**: This mod requires Dolphin emulator; it cannot run on original hardware.
+- **Timing Sensitivity**: The mod must be started *after* entering the game world.
+- **Platform Limitations**: While Windows and macOS are supported, newer macOS versions might block memory reading features due to System Integrity Protection (SIP) unless using GDB Mode.
+- **Language**: Only English is supported at this time.
+- **Stability**: This is experimental software. The mod may occasionally crash or fail to write memory cleanly.
 
-## 🐛 Bug Reports & Contributions
-
-**PRs are welcome!** This mod needs help from the community to improve:
-- Fix platform compatibility issues
-- Resolve known bugs and crashes
-- Improve memory reading stability
-- Add new features and LLM providers
-- Test on different game versions and platforms
-
-Found a bug? Want to help? Open an issue or submit a pull request!
+---
 
 ## 🤝 Contributing
 
 Found a bug? Want to add features? **Contributions are very welcome!** This mod needs community help to become stable.
 
-**Most Needed:**
-- 🐛 **Bug Fixes**: Fix crashes, memory issues, and platform compatibility
-- 🖥️ **Platform Support**: Test and fix Windows/Linux compatibility issues
-- 🎮 **Game Versions**: Test with different Animal Crossing versions
-- 📱 **UI Improvements**: Better error handling and user feedback
-- 🧪 **Testing**: Help test on different systems and configurations
+**Areas Needing Help:**
+- 🐛 **Bug Fixes**: Resolve crashes, improve memory stability, and refine memory injection.
+- 🖥️ **Platform Support**: Improve Linux and GDB Mode compatibility.
+- 🎮 **Game Versions**: Expand memory address support for different Animal Crossing releases.
+- 🧠 **LLM Providers**: Add support for local LLMs (like Ollama).
 
-**How to Help:**
-- Report issues with detailed error messages and system info
-- Test on different platforms (Windows, Linux, different macOS versions)
-- Submit pull requests with fixes and improvements
-- Help improve documentation and setup instructions
-
----
+**How to Contribute:**
+1. Open an issue with detailed error logs and system info.
+2. Submit a pull request with your fixes or improvements.
 
 **Ready to bring your Animal Crossing villagers to life with AI?** 🎮✨

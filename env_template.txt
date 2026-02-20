@@ -14,7 +14,15 @@ ENABLE_SCREENSHOT=1          # Capture screenshots for context
 ENABLE_GOSSIP=1              # Villagers remember past conversations
 GENERATION_SUPPRESS_SECONDS=25  # Cooldown between generations
 
+# Experimental Features
+# USE_GDB_MEMORY=1           # Set to 1 to use GDB socket for memory (Fixes macOS Error 5 / SIP issues)
+
 # Advanced Settings (usually don't need to change)
+# MODEL_PROVIDER=google      # Set to 'google' or 'openai' explicitly
+# GOOGLE_MODEL=gemini-1.5-pro
+# OPENAI_MODEL=gpt-4o
+# GOOGLE_MODEL_DECORATOR=gemini-1.5-flash
+# OPENAI_MODEL_DECORATOR=gpt-4o-mini
 # TARGET_ADDRESS=0x81298360  # Memory address for dialogue
 # READ_SIZE=512              # Bytes to read per iteration
 # MAX_READ_SIZE=8192         # Maximum bytes to read
